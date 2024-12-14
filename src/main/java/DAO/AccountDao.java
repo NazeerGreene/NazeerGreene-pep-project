@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import Model.Account;
 import Util.ConnectionUtil;
@@ -20,7 +21,7 @@ public class AccountDao {
         try {
             String sql = "INSERT INTO account (username, password) VALUES (?, ?);";
 
-            PreparedStatement ps = connection.prepareStatement(sql);
+            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, account.getUsername());
             ps.setString(2, account.getPassword());
             ps.executeUpdate();
@@ -54,9 +55,8 @@ public class AccountDao {
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setString(1, account.getUsername());
             ps.setString(2, account.getPassword());
-            ps.executeQuery();
-
-            ResultSet rs = ps.getGeneratedKeys();
+            
+            ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 int account_id = rs.getInt(1);
                 return new Account(account_id, account.getUsername(), account.getPassword());
@@ -77,13 +77,13 @@ public class AccountDao {
         Connection connection = ConnectionUtil.getConnection();
 
         try {
-            String sql = "SELECT username FROM account WHERE username = ?;";
+            String sql = "SELECT COUNT(*) FROM account WHERE username = ?;";
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setString(1, username);
-            ps.executeQuery();
 
-            ResultSet rs = ps.getGeneratedKeys();
-            if (rs.next()) {
+            ResultSet rs = ps.executeQuery();
+            if (rs.next() && rs.getInt(1) > 0) {
+                System.out.println("duplicate found");
                 return true;
             }
         } catch (SQLException ex) {
