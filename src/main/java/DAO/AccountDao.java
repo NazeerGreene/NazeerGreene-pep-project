@@ -10,6 +10,10 @@ import Util.ConnectionUtil;
 
 public class AccountDao {
 
+    /*
+     * @param Account with username and password
+     * @return Account (id, username, password) for a new user
+    */
     public Account registerNewUser(Account account) {
         Connection connection = ConnectionUtil.getConnection();
 
@@ -19,7 +23,7 @@ public class AccountDao {
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setString(1, account.getUsername());
             ps.setString(2, account.getPassword());
-            ps.executeQuery();
+            ps.executeUpdate();
 
             ResultSet rs = ps.getGeneratedKeys();
             if (rs.next()) {
@@ -34,6 +38,10 @@ public class AccountDao {
         return null;
     }
 
+    /*
+     * @param Account with username and password
+     * @return Account (id, username, password) if user already in database
+    */
     public Account verifyExistingUser(Account account) {
         Connection connection = ConnectionUtil.getConnection();
 
@@ -59,6 +67,30 @@ public class AccountDao {
         }
         
         return null;
+    }
+
+    /*
+     * @param String username to find in database
+     * @return true if in database, false otherwise
+    */
+    public boolean usernameTaken(String username) {
+        Connection connection = ConnectionUtil.getConnection();
+
+        try {
+            String sql = "SELECT username FROM account WHERE username = ?;";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, username);
+            ps.executeQuery();
+
+            ResultSet rs = ps.getGeneratedKeys();
+            if (rs.next()) {
+                return true;
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+        
+        return false;
     }
     
 }
