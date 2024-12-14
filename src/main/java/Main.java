@@ -14,8 +14,6 @@ public class Main {
     public static void main(String[] args) {
         ConnectionUtil.resetTestDatabase();
 
-        account_service();
-
     }
 
     public static void account_dao() {

@@ -9,7 +9,7 @@ public class MessageDao {
         return null;
     }
 
-    List<Message> getMessagesByUserId(int messageId) {
+    List<Message> getMessagesByUserId(int userId) {
         return null;
     }
 

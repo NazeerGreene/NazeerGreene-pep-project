@@ -52,6 +52,10 @@ public class AccountService {
         return accountDao.verifyExistingUser(account);
     }
 
+    public Account verifyAccountById(int accountId) {
+        return null;
+    }
+
     private boolean credentialsAreValid(String username, String password) {
         if (username.isBlank()) {
             return false;
