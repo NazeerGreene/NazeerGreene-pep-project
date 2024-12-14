@@ -82,6 +82,7 @@ public class SocialMediaController {
 
     private void createMessage(Context context) {
         // Json Message(id, content), 200
+        // verify poster_id
         // fail: 400
     }
 

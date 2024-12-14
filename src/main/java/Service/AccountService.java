@@ -22,6 +22,7 @@ public class AccountService {
     }
 
     /*
+     * Add a new user to the system, verifies service rules.
      * @param Account with username and password to register new user
      * @return Account (id, username, password) if service rules met
     */
@@ -32,7 +33,7 @@ public class AccountService {
             return null;
         }
 
-        if (accountDao.usernameTaken(account.getUsername())) {
+        if (usernameTaken(account.getUsername())) {
             return null;
         }
 
@@ -40,6 +41,7 @@ public class AccountService {
     }
 
     /*
+     * Verify that a user already exist in the system.
      * @param Account with username and password to verify
      * @return Account (id, username, password) if found in database
     */
@@ -52,10 +54,18 @@ public class AccountService {
         return accountDao.verifyExistingUser(account);
     }
 
-    public Account verifyAccountById(int accountId) {
-        return null;
+    /*
+     * Find user by their user ID.
+     * @param int user ID
+     * @return Account(id, username)
+    */
+    public Account getAccountByUserId(int accountId) {
+        return accountDao.getUserByUserId(accountId);
     }
 
+    /*
+     * Helper: verifies credential rules
+    */
     private boolean credentialsAreValid(String username, String password) {
         if (username.isBlank()) {
             return false;
@@ -66,6 +76,10 @@ public class AccountService {
         } 
 
         return true;
+    }
+
+    private boolean usernameTaken(String username) {
+        return accountDao.getUserByUsername(username) != null;
     }
     
 }

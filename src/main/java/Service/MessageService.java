@@ -23,7 +23,6 @@ public class MessageService {
         return null;
         // message not blank
         // message not over 255 char
-        // posted_by refers to existing user
         // return Message(id, content) or null
     }
 

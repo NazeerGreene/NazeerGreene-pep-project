@@ -12,6 +12,7 @@ import Util.ConnectionUtil;
 public class AccountDao {
 
     /*
+     * Add a new user to the database.
      * @param Account with username and password
      * @return Account (id, username, password) for a new user
     */
@@ -40,6 +41,7 @@ public class AccountDao {
     }
 
     /*
+     * Query the database for an account that matches Account(username, password).
      * @param Account with username and password
      * @return Account (id, username, password) if user already in database
     */
@@ -70,27 +72,53 @@ public class AccountDao {
     }
 
     /*
+     * Query the database for a user by username.
      * @param String username to find in database
-     * @return true if in database, false otherwise
+     * @return Account(id, username) if in database, null otherwise
     */
-    public boolean usernameTaken(String username) {
+    public Account getUserByUsername(String username) {
         Connection connection = ConnectionUtil.getConnection();
 
         try {
-            String sql = "SELECT COUNT(*) FROM account WHERE username = ?;";
+            String sql = "SELECT account_id, username FROM account WHERE username = ?;";
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setString(1, username);
 
             ResultSet rs = ps.executeQuery();
-            if (rs.next() && rs.getInt(1) > 0) {
-                System.out.println("duplicate found");
-                return true;
+            if (rs.next()) {
+                int account_id = rs.getInt(1);
+                return new Account(account_id, username, null);
             }
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
         }
         
-        return false;
+        return null;
+    }
+
+    /*
+     * Query the database for a user by the user ID.
+     * @param int user ID to find in database
+     * @return Account(id, username) if in database, null otherwise
+    */
+    public Account getUserByUserId(int userId) {
+        Connection connection = ConnectionUtil.getConnection();
+
+        try {
+            String sql = "SELECT account_id, username FROM account WHERE account_id = ?;";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, userId);
+
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                String username = rs.getString(2);
+                return new Account(userId, username, null);
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+        
+        return null;
     }
     
 }
