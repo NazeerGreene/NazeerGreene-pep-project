@@ -1,33 +1,66 @@
 package Controller;
 
+import Model.Account;
+import Service.AccountService;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 
-/**
- * TODO: You will need to write your own endpoints and handlers for your controller. The endpoints you will need can be
- * found in readme.md as well as the test cases. You should
- * refer to prior mini-project labs and lecture materials for guidance on how a controller may be built.
- */
+
 public class SocialMediaController {
-    /**
-     * In order for the test cases to work, you will need to write the endpoints in the startAPI() method, as the test
-     * suite must receive a Javalin object from this method.
+    private static final AccountService accountService;
+
+    private static final int FAILURE_REGISTRATION = 400;
+    private static final int FAILURE_LOGIN = 401;
+    private static final int SUCCESS_REGISTRATION = 200;
+
+    static {
+        accountService = new AccountService();
+    }
+
+    /*
      * @return a Javalin app object which defines the behavior of the Javalin controller.
      */
     public Javalin startAPI() {
         Javalin app = Javalin.create();
-        app.get("example-endpoint", this::exampleHandler);
+
+        // Account Handlers
+        app.post("register", this::signUpForNewUserHandler);
+        app.post("login", this::loginForExistingUserHandler);
+
+        // Message Handlers
 
         return app;
     }
 
-    /**
-     * This is an example handler for an example endpoint.
-     * @param context The Javalin Context object manages information about both the HTTP request and response.
-     */
-    private void exampleHandler(Context context) {
-        context.json("sample text");
+
+    private void signUpForNewUserHandler(Context context) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+
+        Account newAccount = mapper.readValue(context.body(), Account.class);
+        Account addedAccount = accountService.registerNewUser(newAccount);
+
+        if (addedAccount == null) {
+            context.status(HttpStatusCode.FAILURE_REGISTRATION.code());
+        } else {
+            context.json(addedAccount).status(HttpStatusCode.SUCCESS.code());
+        }
     }
 
+    private void loginForExistingUserHandler(Context context) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+
+        Account unverifiedAccount = mapper.readValue(context.body(), Account.class);
+        Account verifiedAccount = accountService.verifyExistingUser(unverifiedAccount);
+
+        if (verifiedAccount == null) {
+            context.status(HttpStatusCode.FAILURE_LOGIN.code());
+        } else {
+            context.json(verifiedAccount).status(HttpStatusCode.SUCCESS.code());
+        }
+    }
 
 }
