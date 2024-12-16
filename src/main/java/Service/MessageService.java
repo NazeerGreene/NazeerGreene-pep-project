@@ -1,42 +1,54 @@
 package Service;
 
 import Model.Message;
+import DAO.MessageDao;
 
 import java.util.List;
 
 public class MessageService {
+    private final MessageDao messageDao;
+
+    private static final int MAX_MESSAGE_LENGTH = 255;
+
+    public MessageService() {
+        messageDao = new MessageDao();
+    }
+
     public List<Message> getAllMessages() {
-        return null;
+        return messageDao.getAllMessages();
     }
 
-    List<Message> getMessagesByUserId(int userId) {
-        return null;
-        // either messages for accountId or null
+    public List<Message> getMessagesByUserId(int userId) {
+        return messageDao.getMessagesByUserId(userId);
     }
 
-    Message getMessageById(int messageId) {
-        return null;
-        // return message by id or null
+    public Message getMessageById(int messageId) {
+        return messageDao.getMessageById(messageId);
     }
 
-    Message createMessage(Message message) {
-        return null;
-        // message not blank
-        // message not over 255 char
-        // return Message(id, content) or null
+    public Message createMessage(Message message) {
+        return isValidMessage(message) ? messageDao.createMessage(message) : null;
     }
 
-    Message deleteMessageById(int messageId) {
-        return null;
-        // return and delete message by id
-        // otherwise null
+    public Message deleteMessageById(int messageId) {
+        return messageDao.deleteMessageById(messageId);
     }
 
-    Message updateMessageById(Message message) {
-        return null;
-        // messageId must already exist
-        // content cannot be blank
-        // content cannot be over 255 characters
-        // other information may be present in request body
+    public Message updateMessageById(Message message) {
+        
+        if (messageDao.getMessageById(message.getMessage_id()) == null) { // if not found
+            return null; // then there's nothing to update
+        }
+
+        return isValidMessage(message) ? messageDao.updateMessage(message) : null;
+    }
+
+    private boolean isValidMessage(Message message) {
+        String text = message.getMessage_text();
+
+        return !text.isBlank() && 
+        text.length() <= MAX_MESSAGE_LENGTH && 
+        message.getPosted_by() < 1 && // user doesn't exist
+        message.getTime_posted_epoch() < 0;
     }
 }

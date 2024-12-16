@@ -1,8 +1,11 @@
 package Controller;
 
 import Model.Account;
+import Model.Message;
 import Service.AccountService;
 import Service.MessageService;
+
+import java.util.List;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -69,15 +72,25 @@ public class SocialMediaController {
     }
 
     private void getAllMessages(Context context) {
-        // Json List<Message>, 200
+        List<Message> messages = messageService.getAllMessages();
+
+        context.json(messages); // implicit 200 OK
     }
 
     private void getMessagesForUserId(Context context) throws JsonProcessingException {
-        // Json List<Message> for int=userId, 200
+        int user_id = Integer.parseInt(context.pathParam("message_id"));
+        List<Message> messages = messageService.getMessagesByUserId(user_id);
+
+        context.json(messages); // implicit 200 OK
     }
 
     private void getMessageById(Context context) throws JsonProcessingException {
-        // Json Message, 200
+        int user_id = Integer.parseInt(context.pathParam("message_id"));
+        Message message = messageService.getMessageById(user_id);
+
+        Object emptyJson = new Object();
+
+        context.json(message == null ? emptyJson : message); // implicit 200 OK
     }
 
     private void createMessage(Context context) {

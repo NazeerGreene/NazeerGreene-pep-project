@@ -46,7 +46,7 @@ public class MessageDao {
      * Return all messages in database according to the user ID.
      * @return List<Message> the list of messages
     */
-    List<Message> getMessagesByUserId(int userId) {
+    public List<Message> getMessagesByUserId(int userId) {
         Connection connection = ConnectionUtil.getConnection();
 
         List<Message> messages = new ArrayList<>();
@@ -76,7 +76,7 @@ public class MessageDao {
      * Returns a message in database according to the message ID.
      * @return Message the message
     */
-    Message getMessageById(int messageId) {
+    public Message getMessageById(int messageId) {
         Connection connection = ConnectionUtil.getConnection();
 
         try {
@@ -105,7 +105,7 @@ public class MessageDao {
      * @param Message(posted_by, message_text, time_posted_epoch)
      * @return Message(message_id, posted_by, message_text, time_posted_epoch) or null if insert failed
     */
-    Message createMessage(Message message) {
+    public Message createMessage(Message message) {
         Connection connection = ConnectionUtil.getConnection();
 
         try {
@@ -136,7 +136,7 @@ public class MessageDao {
      * @param int the message ID
      * @return Message the message to be deleted
     */
-    Message deleteMessageById(int messageId) {
+    public Message deleteMessageById(int messageId) {
         Connection connection = ConnectionUtil.getConnection();
 
         Message message = getMessageById(messageId);
@@ -167,7 +167,7 @@ public class MessageDao {
      * 
      * NOTE: Only message_text and time_posted_epoch will be updated; not message_id nor posted_by.
     */
-    Message updateMessageById(Message message) {
+    public Message updateMessage(Message message) {
         Connection connection = ConnectionUtil.getConnection();
 
         try {
