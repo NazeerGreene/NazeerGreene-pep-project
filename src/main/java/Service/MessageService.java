@@ -34,8 +34,7 @@ public class MessageService {
         return messageDao.deleteMessageById(messageId);
     }
 
-    public Message updateMessageById(Message message) {
-        
+    public Message updateMessage(Message message) {
         if (messageDao.getMessageById(message.getMessage_id()) == null) { // if not found
             return null; // then there's nothing to update
         }

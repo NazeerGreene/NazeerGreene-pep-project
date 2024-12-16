@@ -24,7 +24,7 @@ public class AccountService {
     /*
      * Add a new user to the system, verifies service rules.
      * @param Account with username and password to register new user
-     * @return Account (id, username, password) if service rules met
+     * @return Account(id, username, password) if service rules met
     */
     public Account registerNewUser(Account account) {
 
@@ -43,7 +43,7 @@ public class AccountService {
     /*
      * Verify that a user already exist in the system.
      * @param Account with username and password to verify
-     * @return Account (id, username, password) if found in database
+     * @return Account(id, username, password) if found
     */
     public Account verifyExistingUser(Account account) {
         // business rules - redudant, but could save a trip to the database
@@ -57,9 +57,9 @@ public class AccountService {
     /*
      * Find user by their user ID.
      * @param int user ID
-     * @return Account(id, username)
+     * @return Account(id, username) if found
     */
-    public Account getAccountByUserId(int accountId) {
+    public Account getAccountUsernameByUserId(int accountId) {
         return accountDao.getUserByUserId(accountId);
     }
 
