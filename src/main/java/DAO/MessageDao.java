@@ -163,11 +163,11 @@ public class MessageDao {
     /*
      * Update a message in the database.
      * @param Message(message_id, posted_by, message_text, time_posted_epoch) the message to be updated
-     * @return Message the update message
+     * @return Message the updated message
      * 
      * NOTE: Only message_text and time_posted_epoch will be updated; not message_id nor posted_by.
     */
-    public Message updateMessage(Message message) {
+    public Message updateMessageById(Message message) {
         Connection connection = ConnectionUtil.getConnection();
 
         try {

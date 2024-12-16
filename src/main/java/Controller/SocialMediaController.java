@@ -9,17 +9,18 @@ import java.util.List;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 
 public class SocialMediaController {
-    private static final AccountService accountService;
-    private static final MessageService messageService;
+    private final AccountService accountService;
+    private final MessageService messageService;
 
-    private static final Object EMPTY_JSON = new Object();
+    private static final Object EMPTY_JSON = JsonNodeFactory.instance.objectNode();
 
-    static {
+    public SocialMediaController() {
         accountService = new AccountService();
         messageService = new MessageService();
     }
@@ -30,11 +31,11 @@ public class SocialMediaController {
     public Javalin startAPI() {
         Javalin app = Javalin.create();
 
-        // Account Handlers
+        // Account Service
         app.post("register", this::signUpForNewUserHandler);
         app.post("login", this::loginForExistingUserHandler);
 
-        // Message Handlers
+        // Message Service
         app.get("messages", this::getAllMessages);
         app.post("messages", this::createMessage);
         app.get("messages/{message_id}", this::getMessageById);
@@ -42,6 +43,9 @@ public class SocialMediaController {
         app.delete("messages/{message_id}", this::deleteMessageById);
 
         app.get("accounts/{account_id}/messages", this::getMessagesForUserId);
+
+        // Exceptions
+        app.exception(JsonProcessingException.class, this::JsonProcessingExceptionHandler);
 
         return app;
     }
@@ -135,6 +139,12 @@ public class SocialMediaController {
         } else {
             context.json(updatedMessage);
         }
+    }
+
+    private void JsonProcessingExceptionHandler(JsonProcessingException exception, Context context) {
+        String exceptionOutput = String.format("Error while parsing input: %s\n\nMessage: %s\n", context.body(), exception.getOriginalMessage());
+        
+        context.status(HttpStatusCode.CLIENT_ERROR.code()).result(exceptionOutput);
     }
 
 }

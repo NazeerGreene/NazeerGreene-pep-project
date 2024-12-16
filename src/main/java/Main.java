@@ -20,7 +20,8 @@ public class Main {
     public static void main(String[] args) {
         ConnectionUtil.resetTestDatabase();
 
-        
+
+        run();
 
     }
     public static void message_dao() {
