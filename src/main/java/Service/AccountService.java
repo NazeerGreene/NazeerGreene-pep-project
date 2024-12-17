@@ -28,7 +28,7 @@ public class AccountService {
     */
     public Account registerNewUser(Account account) {
 
-        // business rules
+        // service rules
         if(!credentialsAreValid(account.getUsername(), account.getPassword())) {
             return null;
         }
@@ -46,7 +46,7 @@ public class AccountService {
      * @return Account(id, username, password) if found
     */
     public Account verifyExistingUser(Account account) {
-        // business rules - redudant, but could save a trip to the database
+        // service rules - redudant, but could save a trip to the database
         if (!credentialsAreValid(account.getUsername(), account.getPassword())) {
             return null;
         }
@@ -67,15 +67,9 @@ public class AccountService {
      * Helper: verifies credential rules
     */
     private boolean credentialsAreValid(String username, String password) {
-        if (username.isBlank()) {
-            return false;
-        }
-
-        if (password.length() < MIN_PASSWORD_LENGTH) {
-            return false;
-        } 
-
-        return true;
+        return username != null && password != null &&
+        !username.isBlank() && !password.isBlank() &&
+        password.length() > MIN_PASSWORD_LENGTH;
     }
 
     private boolean usernameTaken(String username) {
