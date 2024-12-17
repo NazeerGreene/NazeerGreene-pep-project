@@ -113,16 +113,13 @@ public class MessageService {
      */
     private boolean isValidMessage(Message message) {
         return isValidMessageText(message.getMessage_text()) && 
-        isValidMessageTime(message.getTime_posted_epoch()) && 
+        message.getTime_posted_epoch() > 0 && // valid time
         message.getPosted_by() > 0;// user must exist
     }
 
     private boolean isValidMessageText(String text) {
-        return !text.isBlank() && 
+        return text != null &&
+        !text.isBlank() && 
         text.length() <= MAX_MESSAGE_LENGTH;
-    }
-
-    private boolean isValidMessageTime(long time) {
-        return time > 0;
     }
 }
