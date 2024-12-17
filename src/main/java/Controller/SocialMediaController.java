@@ -9,7 +9,6 @@ import java.util.List;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 
 import io.javalin.Javalin;
 import io.javalin.http.Context;
@@ -17,8 +16,6 @@ import io.javalin.http.Context;
 public class SocialMediaController {
     private final AccountService accountService;
     private final MessageService messageService;
-
-    private static final Object EMPTY_JSON = JsonNodeFactory.instance.objectNode();
 
     public SocialMediaController() {
         accountService = new AccountService();
@@ -50,6 +47,7 @@ public class SocialMediaController {
         return app;
     }
 
+    // ACCOUNT SERVICE HANDLERS
     private void signUpForNewUserHandler(Context context) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
 
@@ -76,6 +74,7 @@ public class SocialMediaController {
         }
     }
 
+    // MESSAGE SERVICE HANDLERS
     private void getAllMessages(Context context) {
         List<Message> messages = messageService.getAllMessages();
         context.json(messages);
@@ -90,7 +89,11 @@ public class SocialMediaController {
     private void getMessageById(Context context) {
         int message_id = Integer.parseInt(context.pathParam("message_id"));
         Message message = messageService.getMessageById(message_id);
-        context.json(message == null ? EMPTY_JSON : message);
+        if (message == null) {
+            context.status(HttpStatusCode.SUCCESS.code());
+        } else {
+            context.json(message);
+        }
     }
 
     private void createMessage(Context context) throws JsonProcessingException {
@@ -117,20 +120,21 @@ public class SocialMediaController {
     private void deleteMessageById(Context context) {
         int message_id = Integer.parseInt(context.pathParam("message_id"));
         Message message = messageService.deleteMessageById(message_id);
-        context.json(message == null ? EMPTY_JSON : message);
+        if (message == null) {
+            context.status(HttpStatusCode.SUCCESS.code());
+        } else {
+            context.json(message);
+        }
     }
 
     private void updateMessage(Context context) throws JsonProcessingException {
+        // below captures the message_text and time_posted_epoch neatly
         ObjectMapper mapper = new ObjectMapper();
         Message receivedMessage = mapper.readValue(context.body(), Message.class);
-        int posted_by = receivedMessage.getPosted_by();
 
-        Account user = accountService.getAccountUsernameByUserId(posted_by);
+        int message_id = Integer.parseInt(context.pathParam("message_id"));
 
-        if (user == null) {
-            context.status(HttpStatusCode.CLIENT_ERROR.code());
-            return;
-        }
+        receivedMessage.setMessage_id(message_id);
 
         Message updatedMessage = messageService.updateMessage(receivedMessage);
 
@@ -141,6 +145,7 @@ public class SocialMediaController {
         }
     }
 
+    // EXCEPTION HANDLERS
     private void JsonProcessingExceptionHandler(JsonProcessingException exception, Context context) {
         String exceptionOutput = String.format("Error while parsing input: %s\n\nMessage: %s\n", context.body(), exception.getOriginalMessage());
         

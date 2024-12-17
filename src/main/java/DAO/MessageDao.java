@@ -134,40 +134,38 @@ public class MessageDao {
     /*
      * Delete a message in the database
      * @param int the message ID
-     * @return Message the message to be deleted
+     * @return True if the message is deleted, False otherwise
     */
-    public Message deleteMessageById(int messageId) {
+    public boolean deleteMessageById(int messageId) {
         Connection connection = ConnectionUtil.getConnection();
-
-        Message message = getMessageById(messageId);
 
         try {
             String sql = "DELETE FROM message WHERE message_id = ?;";
 
             PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setInt(1, message.getMessage_id());
+            ps.setInt(1, messageId);
             
             int rowsAffected = ps.executeUpdate();
             if (rowsAffected > 0) { // should only be 1
-                return message;
+                return true;
             }
 
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
         }
 
-        return null;
+        return false;
     }
 
 
     /*
      * Update a message in the database.
      * @param Message(message_id, posted_by, message_text, time_posted_epoch) the message to be updated
-     * @return Message the updated message
+     * @return True if the message if deleted, False otherwise
      * 
      * NOTE: Only message_text and time_posted_epoch will be updated; not message_id nor posted_by.
     */
-    public Message updateMessageById(Message message) {
+    public boolean updateMessage(Message message) {
         Connection connection = ConnectionUtil.getConnection();
 
         try {
@@ -180,14 +178,14 @@ public class MessageDao {
             
             int rowsAffected = ps.executeUpdate();
             if (rowsAffected > 0) { // should only be 1
-                return message;
+                return true;
             }
 
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
         }
 
-        return null;
+        return false;
     }
 
 }

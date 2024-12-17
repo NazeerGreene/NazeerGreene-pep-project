@@ -31,37 +31,53 @@ public class MessageService {
     }
 
     public Message deleteMessageById(int messageId) {
-        return messageDao.deleteMessageById(messageId);
+        Message message = getMessageById(messageId);
+
+        if (message == null) { // if not found
+            return null; // nothing to delete
+        }
+
+        return messageDao.deleteMessageById(messageId) ? message : null;
     }
 
     public Message updateMessage(Message message) {
-        Message previouMessage = messageDao.getMessageById(message.getMessage_id());
+        // first let's verify the message
+        Message previouMessage = getMessageById(message.getMessage_id());
 
         if (previouMessage == null) { // if not found
             return null; // then there's nothing to update
         }
 
-        // todo: check if time has changed, update accordingly
-        // check if text has changed, update accordingly
-        // states Message could enter
-        // M(..,text, time) - valid
-        // M(.., "", time) - valid: only time update
-        // M(.., text, 0) - valid: only text update
-        // M(.., "", 0) invalid - should delete
+        message.setPosted_by(previouMessage.getPosted_by());
 
-        if (!isValidMessage(message)) {
-
+        if (message.getMessage_text() == null) { // no change to text from user
+            message.setMessage_text(previouMessage.getMessage_text()); // keep old text
         }
 
-        return isValidMessage(message) ? messageDao.updateMessage(message) : null;
+        if (message.getTime_posted_epoch() == 0) { // no change to time from user
+            message.setTime_posted_epoch(previouMessage.getTime_posted_epoch()); // keep old time
+        }
+
+        if (!isValidMessage(message)) {
+            return null;
+        }
+
+        // message has been verified by this point
+        return messageDao.updateMessage(message) ? getMessageById(message.getMessage_id()) : null;
     }
 
     private boolean isValidMessage(Message message) {
-        String text = message.getMessage_text();
+        return isValidMessageText(message.getMessage_text()) && 
+        isValidMessageTime(message.getTime_posted_epoch()) && 
+        message.getPosted_by() > 0;// user must exist
+    }
 
+    private boolean isValidMessageText(String text) {
         return !text.isBlank() && 
-        text.length() <= MAX_MESSAGE_LENGTH && 
-        message.getPosted_by() > 0 ; // user must exist
-        //message.getTime_posted_epoch() > 0;
+        text.length() <= MAX_MESSAGE_LENGTH;
+    }
+
+    private boolean isValidMessageTime(long time) {
+        return time > 0;
     }
 }
